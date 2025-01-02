@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 ```
 # MDCSpatialData
 
-MDCSpatialdData provides spatial data sets in tabular or other R-compatible forms (sf, terra) for easy access by MDC staff or others. All data objects are projected in NAD83 UTM15N unless otherwise noted. Measurement attriubutes in spatial objects (e.g., sf, terra) may not be based on the projected coordinate system. All tabular data calculations have been performed on spatial data using NAD83 UTM15N.
+MDCSpatialData provides spatial data sets in tabular or other R-compatible forms (sf, terra) for easy access by MDC staff or others. All data objects are projected in NAD83 UTM15N unless otherwise noted. Measurement attriubutes in spatial objects (e.g., sf, terra) may not be based on the projected coordinate system. All tabular data calculations have been performed on spatial data using NAD83 UTM15N.
 
 ## Installation
 You can install the MDChelp from [GitHub](https://github.com/) with:
