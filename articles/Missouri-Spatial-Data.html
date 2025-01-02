@@ -33,7 +33,8 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/Missouri-Spatial-Data.html">Accessing spatial data for Missouri</a></li>
+<li><a class="dropdown-item" href="../articles/Batch-Process-Raster-from-FedData.html">Batch Processing FedData</a></li>
+    <li><a class="dropdown-item" href="../articles/Missouri-Spatial-Data.html">Accessing spatial data for Missouri</a></li>
   </ul>
 </li>
       </ul>
@@ -64,23 +65,13 @@
 
     
     
-<p>I am generally trying to avoid including actual spatial data sets
-(e.g. sf or terra objects) in with the <strong>MDChelp</strong> package
-to minimize the package size. Still, if there is some spatial data that
-can be expressed in tabular form and you don’t need the explicit
-geometry information, I can try to add it in.</p>
-<p>The only spatial objects included in the package are an sf object
-call <strong>counties.mo</strong> which is a spatial layer of all
-Missouri counties, and <strong>state.mo</strong> which is a single
-polygon of the state border. They are projected in NAD83 UTM 15N. Two
-NLCD data sets are also included as tabular data. They are the % and
-total area (square km) of several cover classes in each county. Cover
-classes are modified from the original data. See the help sections for
-each data set to see what changes were made.</p>
-<p>Most other types of spatial data can either be obtained from outside
-sources. Two R pacakges that facilitate this are <strong>tigris</strong>
-and <strong>FedData</strong>. Tigris lets you download sf objects of
-files from the national TIGER data set, while FedData lets you download
+<div class="section level2">
+<h2 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
+</h2>
+<p>Most of the spatial data in the MDCSpatialData package are derived
+from two R packages, <strong>tigris</strong> and
+<strong>FedData</strong>. Tigris lets you download sf objects of files
+from the national TIGER data set, while FedData lets you download
 spatial data from a variety of sources (NHD, NLCD, NASS, SSUGO, etc.)
 Your best bet is to look at those reference manuals, but I give a few
 quick examples here.</p>
@@ -92,8 +83,8 @@ quick examples here.</p>
 <code class="sourceCode R"><span></span>
 <span><span class="co">#not run</span></span>
 <span></span>
-<span><span class="fu">MDChelp</span><span class="fu">::</span><span class="va">counties.mo</span><span class="op">-&gt;</span><span class="va">counties.mo</span></span>
-<span><span class="fu">MDChelp</span><span class="fu">::</span><span class="va">state.mo</span><span class="op">-&gt;</span><span class="va">state.mo</span></span>
+<span><span class="fu">MDCSpatialData</span><span class="fu">::</span><span class="va"><a href="../reference/counties.mo.html">counties.mo</a></span><span class="op">-&gt;</span><span class="va">counties.mo</span></span>
+<span><span class="fu">MDCSpatialData</span><span class="fu">::</span><span class="va"><a href="../reference/state.mo.html">state.mo</a></span><span class="op">-&gt;</span><span class="va">state.mo</span></span>
 <span></span>
 <span><span class="fu">ggplot</span><span class="op">(</span><span class="va">counties.mo</span><span class="op">)</span><span class="op">+</span></span>
 <span>  <span class="fu">geom_sf</span><span class="op">(</span><span class="op">)</span></span>
@@ -123,16 +114,23 @@ can pull from. Definitley read the reference manual for this package to
 get a comprehensive idea of what data are available.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># need a boundary shape. If it's not a rectangle or a square, one will be created internal to the function before extracting the data. The bounding area will be extracted from the min/max X and Y coordinates of the polygon.</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">state.mo</span>,package<span class="op">=</span><span class="st">'MDChelp'</span><span class="op">)</span></span>
 <span></span>
 <span></span>
-<span><span class="co">#get NASS Cropland data layer data</span></span>
-<span><span class="fu">FedData</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/FedData/reference/get_nass_cdl.html" class="external-link">get_cdl</a></span><span class="op">(</span>template<span class="op">=</span><span class="va">state.mo</span>,</span>
+<span></span>
+<span><span class="co">#get NASS Cropland data layer data this has a size limit for the raster</span></span>
+<span></span>
+<span><span class="fu">MDCSpatialData</span><span class="fu">::</span><span class="va">countes.mo</span><span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">NAME</span><span class="op">==</span><span class="st">'Boone'</span><span class="op">)</span><span class="op">-&gt;</span><span class="va">boone.co</span></span>
+<span><span class="fu">FedData</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/FedData/reference/get_nass_cdl.html" class="external-link">get_nass_cdl</a></span><span class="op">(</span>template<span class="op">=</span><span class="va">boone.co</span>,</span>
 <span>                 label<span class="op">=</span><span class="st">'MO'</span>,</span>
-<span>                 year<span class="op">=</span><span class="fl">2023</span><span class="op">)</span><span class="op">-&gt;</span><span class="va">cdl.mo</span></span>
+<span>                 year<span class="op">=</span><span class="fl">2023</span><span class="op">)</span><span class="op">-&gt;</span><span class="va">cdl.boone</span></span>
+<span></span>
+<span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">cdl.boone</span><span class="op">)</span></span>
 <span><span class="co"># returns a SpatRaster, a terra raster object class</span></span>
+<span></span>
+<span></span>
 <span><span class="co">#get NHD data</span></span>
-<span><span class="fu">FedData</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/FedData/reference/get_nhd.html" class="external-link">get_nhd</a></span><span class="op">(</span>template<span class="op">=</span><span class="va">state.mo</span>,</span>
+<span><span class="fu">FedData</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/FedData/reference/get_nhd.html" class="external-link">get_nhd</a></span><span class="op">(</span>template<span class="op">=</span><span class="fu">MDCSpatialData</span><span class="fu">::</span><span class="va"><a href="../reference/state.mo.html">state.mo</a></span>,</span>
 <span>                 label<span class="op">=</span><span class="st">'MO'</span>,   <span class="co">#for use if writing the data to file vs storing in memory.</span></span>
 <span>                 nhdplus<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">-&gt;</span><span class="va">nhd.mo</span></span>
 <span></span>
@@ -140,9 +138,10 @@ get a comprehensive idea of what data are available.</p>
 <span></span>
 <span><span class="co"># get HUC12 data (the only scale available in FedData)</span></span>
 <span></span>
-<span><span class="fu">FedData</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/FedData/reference/get_wbd.html" class="external-link">get_wbd</a></span><span class="op">(</span>template<span class="op">=</span><span class="va">state.mo</span>,label<span class="op">=</span><span class="st">'MO'</span><span class="op">)</span><span class="op">-&gt;</span><span class="va">huc.mo</span></span>
+<span><span class="fu">FedData</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/FedData/reference/get_wbd.html" class="external-link">get_wbd</a></span><span class="op">(</span>template<span class="op">=</span><span class="fu">MDCSpatialData</span><span class="fu">::</span><span class="va"><a href="../reference/state.mo.html">state.mo</a></span>,label<span class="op">=</span><span class="st">'MO'</span><span class="op">)</span><span class="op">-&gt;</span><span class="va">huc.mo</span></span>
 <span></span>
 <span><span class="co">#returns a sf object</span></span></code></pre></div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
