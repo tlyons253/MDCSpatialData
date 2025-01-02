@@ -11,8 +11,8 @@
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Spatial datasets for MDC">
-<meta name="description" content="What the package does (one paragraph).">
-<meta property="og:description" content="What the package does (one paragraph).">
+<meta name="description" content="A package of tabular and spatial data sets for the state of Missouri. All spatial objects are projected to NAD83 UTM 15N, but measurement fields in raw files may be calculated in a different coordinate system, depending on the data source. All statistics for tabular data are computed using the NAD83 UTM 15N projections.">
+<meta property="og:description" content="A package of tabular and spatial data sets for the state of Missouri. All spatial objects are projected to NAD83 UTM 15N, but measurement fields in raw files may be calculated in a different coordinate system, depending on the data source. All statistics for tabular data are computed using the NAD83 UTM 15N projections.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -45,8 +45,39 @@
   </div>
 </nav><div class="container template-home">
 <div class="row">
-  <main id="main" class="col-md-9">
-What the package does (one paragraph).
+  <main id="main" class="col-md-9"><p>Last updated 2025-01-02</p>
+<div class="section level1">
+<div class="page-header"><h1 id="mdcspatialdata">MDCSpatialData<a class="anchor" aria-label="anchor" href="#mdcspatialdata"></a>
+</h1></div>
+<p>MDCSpatialdData provides spatial data sets in tabular or other R-compatible forms (sf, terra) for easy access by MDC staff or others. All data objects are projected in NAD83 UTM15N unless otherwise noted. Measurement attriubutes in spatial objects (e.g., sf, terra) may not be based on the projected coordinate system. All tabular data calculations have been performed on spatial data using NAD83 UTM15N.</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>You can install the MDChelp from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"tlyons253/MDCSpatialData"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="examples">Examples<a class="anchor" aria-label="anchor" href="#examples"></a>
+</h2>
+<p>On advantage to having these spatial data sets in a separate package is they do not need to be read into memory to be processed; they don’t need to take up RAM in their raw format.</p>
+<p>For example, if you wanted to clip flowlines to Boone County you might normally try:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">MDCSpatialData</span><span class="fu">::</span><span class="va"><a href="reference/nhd.flowline.mo.html">nhd.flowline.mo</a></span><span class="op">-&gt;</span><span class="va">flowlines</span></span>
+<span></span>
+<span><span class="fu">MDCSpatialData</span><span class="fu">::</span><span class="va"><a href="reference/counties.mo.html">counties.mo</a></span><span class="op">-&gt;</span><span class="va">counties</span></span>
+<span></span>
+<span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">st_intersection</a></span><span class="op">(</span><span class="va">flowlines</span>,<span class="va">counties</span><span class="op">)</span><span class="op">-&gt;</span><span class="va">boone.flow</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">flowlines</span><span class="op">)</span> <span class="co"># remove the raw flowlines file</span></span></code></pre></div>
+<p>But that reads in all flowlines in the state. A more memory friendly version that doesn’t keep the raw flowlines file in the environment is:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_binary_ops.html" class="external-link">st_intersection</a></span><span class="op">(</span><span class="fu">MDCSpatialData</span><span class="fu">::</span><span class="va"><a href="reference/nhd.flowline.mo.html">nhd.flowline.mo</a></span>,</span>
+<span>                    <span class="fu">MDCSpatialData</span><span class="fu">::</span><span class="va"><a href="reference/counties.mo.html">counties.mo</a></span><span class="op">)</span><span class="op">-&gt;</span><span class="va">boone.flow</span></span></code></pre></div>
+</div>
+</div>
+
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
