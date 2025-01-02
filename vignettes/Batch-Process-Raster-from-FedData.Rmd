@@ -1,0 +1,116 @@
+---
+title: "Batch Processing FedData"
+date: " Last update: `r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Batch Processing
+
+This is an example for batch processing multiple years of NLCD data. It requires creating a folder with two subfolders where the tif's can be stored. The NCLD data is unprojected when it's downloaded, so you will need to project it to your preferred coordinate system. It's a multi-step process.
+
+
+### Setup
+```{r, eval=FALSE}
+dir.create('C:/Users/Lyonst/Desktop/NLCD/unproj',
+           recursive = TRUE)# create a folder and first subfolder for storing unprojected tif's. Use relative paths if you know how to and/or have an R project set up. 
+
+my.path<-'C:/Users/Lyonst/Desktop/NLCD'  # save the parent folder path as an object, not just the lowest folder
+
+years_to_dl<-c(2010,2015,2020) # object referencing the years of NCLD you'd like to download
+# Older NLCD data was only released about every 3 years, but now USGS is going back and using different processing to generate/estimate/interpolate annual data sets. Upshot is, you now have annual data if you think you need it
+```
+
+
+
+Now use the vector of years to iteratively download the data from [FedData].
+
+```{r, eval=FALSE}
+# pass the vector of years to the map function to iteratively call FedData::get_nlcd_annual
+
+purrr::map(years_to_dl,
+           ~FedData::get_nlcd_annual(template=MDCSpatialData::state.mo,
+                                     label='MO_noproj',
+                                     year=.x,
+                                     product='LndCov',
+                                     extraction.dir=paste0(my.path,'/unproj')
+                                     )
+)
+
+
+```
+This writes 3 tif files with "MO_noproj" in the file name. The files are 2010, 2015, and 2020 annual NLCD landcover. The way FedData works is it creates a rectangle of min/max X and Y for the template and crops to that. So our rasters contain a good chunk of KS, IL and a little bit of IA and AR.  We'll clean that up in the next step
+
+
+### Reproject
+To reproject, you'll need to create an object of the full file paths of all the unprojected files, setup another subfolder to hold the reprojected tif's, 
+
+
+```{r,eval=FALSE}
+# List the tif files in the folder
+
+unproj.files<-list.files(path=paste0(my.path,'/unproj'),
+                         pattern='.tif$', # regex for files that end in .tif
+                         full.names = TRUE) 
+
+
+#create a vector of new names
+
+rast.names<-purrr::map(unproj.files,
+                ~paste0('NLCD_Y',stringr::str_extract(.x,pattern='20\\d{2}'),'_proj'))
+
+#tif file names will now look like 'NLCD_Y2010_proj.tif' after reprojections
+
+
+
+
+dir.create('C:/Users/Lyonst/Desktop/NLCD/prj') # Create a directory to hold the projected files
+
+
+ # write a function to take the list of unprojected files and names we'd like to have for the new projected files, and reproject, crop/mask and write them  
+
+rast.fxn<-function(X,Y){
+  
+    terra::project(terra::rast(X),'EPSG:26915')->Z#NAD83 UTM15N code
+    terra::mask(Z,terra::vect(MDCSpatialData::state.mo))->W # assign raster cells outside the state boundary an NA value
+    terra::writeRaster(W,
+                   filename=paste0(my.path,'/prj/',rast.names,'.tif'))
+}
+
+# use future to run these in parallel
+future::plan("multisession",workers=3)
+furrr::future_map2(unproj.files,rast.names,~rast.fxn(.x,.y))
+# this takes approximately 10 minutes for 3 NLCD rasters for the state of MO
+
+
+future::plan('sequential') # reset
+
+
+```
+You can stop here and delete all the entire **.../unproj/** folder if you like. Alternatively, you can combine all the annual raster files into a multiband raster object. The advantage is you only have to read in one object to get all your rasters. The downside is  it's probably more efficient to process the data by creating lists of files and passing it to [purrr::map] as we have done above. Still...if you want to try...
+
+```{r}
+my.rast<-list.files(path=paste0(my.path,'/prj'),
+                         pattern='.tif$', # regex for files that end in .tif
+                         full.names = TRUE) 
+
+# read in multiple rasters
+
+tmp<-terra::rast(my.rast)
+
+terra::writeRaster(tmp,file=paste0(my.path,'/prj/all_nlcd.tif'))
+
+
+
+```
+There are additional functions in terra that help you process the bands together or separately. Note that the multiband raster only works if all the bands have the exact same spatial extent. So if you think you might want to crop or clip different years in different ways, it's best to keep the individual years as separate files and objects, even if it is less efficient with memory.
