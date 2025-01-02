@@ -4,13 +4,18 @@ Version: 0.0.0.9000
 Authors@R: 
     person("Tim", "Lyons", , "timothy.lyons@mdc.mo.gov", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-6327-9799"))
-Description: What the package does (one paragraph).
+Description: A package of tabular and spatial data sets for the state of Missouri.
+ All spatial objects are projected to NAD83 UTM 15N, but measurement fields in 
+ raw files may be calculated in a different coordinate system, depending on the 
+ data source. All statistics for tabular data are computed using the NAD83 UTM
+ 15N projections.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Depends: 
     R (>= 3.50)
+Suggests: knitr, rmarkdown,tidyverse, tigris, FedData, sf, terra
 LazyData: true
 URL: https://github.com/tlyons253/MDCSpatialData
 BugReports: https://github.com/tlyons253/MDCSpatialData/issues

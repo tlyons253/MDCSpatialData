@@ -2,3 +2,16 @@ url: https://tlyons253.github.io/MDCSpatialData/
 template:
   bootstrap: 5
 
+reference:
+- title: NHD data
+- subtitle: spatial data
+  contents:
+  - starts_with('nhd')
+- title: NLCD data
+- subtitle: tabular data
+  contents:
+  - starts_with('nlcd')
+- title: Boundary objects
+  contents:
+  - state.mo
+  - counties.mo
