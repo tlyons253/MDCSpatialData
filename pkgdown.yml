@@ -1,8 +1,9 @@
 pandoc: 3.1.11
 pkgdown: 2.1.1
 pkgdown_sha: ~
-articles: {}
-last_built: 2025-01-02T17:19Z
+articles:
+  Missouri-Spatial-Data: Missouri-Spatial-Data.html
+last_built: 2025-01-02T17:46Z
 urls:
   reference: https://tlyons253.github.io/MDCSpatialData/reference
   article: https://tlyons253.github.io/MDCSpatialData/articles
