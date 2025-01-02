@@ -18,7 +18,7 @@ MDCSpatialdData provides spatial data sets in tabular or other R-compatible form
 ## Installation
 You can install the MDChelp from [GitHub](https://github.com/) with:
 
-``` {r}
+``` {r, eval=FALSE}
 # install.packages("devtools")
 devtools::install_github("tlyons253/MDCSpatialData")
 ```
@@ -28,7 +28,7 @@ devtools::install_github("tlyons253/MDCSpatialData")
 On advantage to having these spatial data sets in a separate package is they do not need to be read into memory to be processed; they don't need to take up RAM in their raw format.
 
 For example, if you wanted to clip flowlines to Boone County you might normally try:
-```{r}
+```{r, eval=FALSE}
 MDCSpatialData::nhd.flowline.mo->flowlines
 
 MDCSpatialData::counties.mo->counties
@@ -40,7 +40,7 @@ rm(flowlines) # remove the raw flowlines file
 
 But that reads in all flowlines in the state. A more memory friendly version that doesn't keep the raw flowlines file in the environment is:
 
-```{r}
+```{r,eval=FALSE}
 sf::st_intersection(MDCSpatialData::nhd.flowline.mo,
                     MDCSpatialData::counties.mo)->boone.flow
 ```

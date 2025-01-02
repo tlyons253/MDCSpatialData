@@ -16,19 +16,6 @@ You can install the MDChelp from [GitHub](https://github.com/) with:
 ``` r
 # install.packages("devtools")
 devtools::install_github("tlyons253/MDCSpatialData")
-#> Using GitHub PAT from the git credential store.
-#> Downloading GitHub repo tlyons253/MDCSpatialData@HEAD
-#> ── R CMD build ─────────────────────────────────────────────────────────────────
-#>          checking for file 'C:\Users\Lyonst\AppData\Local\Temp\Rtmpg33WRC\remotes1243c072242\tlyons253-MDCSpatialData-a124850/DESCRIPTION' ...  ✔  checking for file 'C:\Users\Lyonst\AppData\Local\Temp\Rtmpg33WRC\remotes1243c072242\tlyons253-MDCSpatialData-a124850/DESCRIPTION' (526ms)
-#>       ─  preparing 'MDCSpatialData':
-#>    checking DESCRIPTION meta-information ...     checking DESCRIPTION meta-information ...   ✔  checking DESCRIPTION meta-information
-#>       ─  checking for LF line-endings in source and make files and shell scripts (388ms)
-#>   ─  checking for empty or unneeded directories
-#>       ─  building 'MDCSpatialData_0.0.0.9000.tar.gz'
-#>      
-#> 
-#> Installing package into 'C:/Users/Lyonst/AppData/Local/Temp/RtmpCe0GPs/temp_libpath577468c33088'
-#> (as 'lib' is unspecified)
 ```
 
 ## Examples
@@ -46,11 +33,6 @@ MDCSpatialData::nhd.flowline.mo->flowlines
 MDCSpatialData::counties.mo->counties
 
 sf::st_intersection(flowlines,counties)->boone.flow
-#> Warning: attribute variables are assumed to be spatially constant throughout
-#> all geometries
-```
-
-``` r
 
 rm(flowlines) # remove the raw flowlines file
 ```
@@ -61,6 +43,4 @@ version that doesn’t keep the raw flowlines file in the environment is:
 ``` r
 sf::st_intersection(MDCSpatialData::nhd.flowline.mo,
                     MDCSpatialData::counties.mo)->boone.flow
-#> Warning: attribute variables are assumed to be spatially constant throughout
-#> all geometries
 ```
