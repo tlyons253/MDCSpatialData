@@ -65,7 +65,7 @@
 #'
 #' See vignettes for examples on how to batch process
 #'
-#'  Cropping performed with terra::crop
+#'  Cropping performed with terra::crop and the terra:mask
 #'
 #' Area converted to square km based on a 30x30m cell size and summing all
 #' all pixels with in a given class. No other processing occurred.
@@ -73,24 +73,61 @@
 #'
 #' @examples
 #' \dontrun{
-#' #pixel classes were condensed as follows:
+#' #data processed as follows:
 #'
 #'
-#' terra::rast(nlcd)->Z
+#'
+#' # list projected NLCD files in a folder
+#'list.nlcd<-list.files(path='./prj_NLCD/',
+#'                      pattern='.tif$',
+#'                      full.names=TRUE)
+#'
+#'
+#'
+#' MDCSpatialData::counties.mo->co
+#'
+#'
+#'
+#'co%>%split(.$NAME)%>%
+#'  map(.,~terra::vect(.x))->tmp
+#'
+#'nlcd.fxn<-function(nlcd,
+#'                   county,year){
+#'  terra::rast(nlcd)->Z
+#'
 #'  mo.co.list[[county]]->Q
-#'  terra::crop(Z,Q)%>%
-#'  terra::freq()%>%
-#'  filter(str_detect(value,
-#'  'Water|Developed|Forest|Shrub|Grass|Hay|Crops|Wetlands'))%>%
-#'  mutate(LC=case_when(str_detect(value,'Developed')~"develop",
-#'                    str_detect(value,'Forest')~"forest",
-#'                    str_detect(value,'Shrub|Grassland|Hay')~'grass',
-#'                    str_detect(value,'Crops')~'crop',
-#'                    str_detect(value,'Wetlands')~'wetland',
-#'                    str_detect(value,'Water')~'water',
-#'                    TRUE~as.character("other")
-#'                    ))
-#'                    }
+#'
+#'  terra::crop(Z,Q)->P
+#'  terra::mask(P,Q)%>%
+#'    terra::freq()%>%
+#'    rename(LC=value)%>%
+#'    select(LC,count)%>%
+#'    group_by(LC)%>%
+#'    summarize(n.cells=sum(count))%>%
+#'    ungroup()%>%
+#'    mutate(pct.area=n.cells/sum(n.cells),
+#'           area.sqkm=(n.cells*(30*30)/1E6),
+#'           cty=county,
+#'           yr=year)
+#'}
+#'
+#'
+#'
+#'
+#'crossing(list.nlcd,names(mo.co.list))%>%
+#'  rename(path=1,
+#'         county=2)%>%
+#'  mutate(year=str_extract(path,pattern='20\\d{2}'))%>%
+#'  pmap(~nlcd.fxn(..1,..2,..3))->nlcd.tab
+#'
+#'
+#' bind_rows(nlcd.tab)%>%
+#'   select(-n.cells,-pct.area)%>%
+#'   mutate(LC=paste0(LC,'.sqkm'))%>%
+#'   pivot_wider(names_from=LC,
+#'               values_from=area.sqkm)->nlcd.area.tab
+#'}
+#'
 #'
 #' @format
 #' \describe{
@@ -124,23 +161,59 @@
 #'
 #' @examples
 #' \dontrun{
-#' #pixel classes were condensed as follows:
+#' #' #data processed as follows:
 #'
 #'
-#' terra::rast(nlcd)->Z
+#'
+#' # list projected NLCD files in a folder
+#'list.nlcd<-list.files(path='./prj_NLCD/',
+#'                      pattern='.tif$',
+#'                      full.names=TRUE)
+#'
+#'
+#'
+#' MDCSpatialData::counties.mo->co
+#'
+#'
+#'
+#'co%>%split(.$NAME)%>%
+#'  map(.,~terra::vect(.x))->tmp
+#'
+#'nlcd.fxn<-function(nlcd,
+#'                   county,year){
+#'  terra::rast(nlcd)->Z
+#'
 #'  mo.co.list[[county]]->Q
-#'  terra::crop(Z,Q)%>%
-#'  terra::freq()%>%
-#'  filter(str_detect(value,
-#'  'Water|Developed|Forest|Shrub|Grass|Hay|Crops|Wetlands'))%>%
-#'  mutate(LC=case_when(str_detect(value,'Developed')~"develop",
-#'                    str_detect(value,'Forest')~"forest",
-#'                    str_detect(value,'Shrub|Grassland|Hay')~'grass',
-#'                    str_detect(value,'Crops')~'crop',
-#'                    str_detect(value,'Wetlands')~'wetland',
-#'                    str_detect(value,'Water')~'water',
-#'                    TRUE~as.character("other")
-#'                    ))
+#'
+#'  terra::crop(Z,Q)->P
+#'  terra::mask(P,Q)%>%
+#'    terra::freq()%>%
+#'    rename(LC=value)%>%
+#'    select(LC,count)%>%
+#'    group_by(LC)%>%
+#'    summarize(n.cells=sum(count))%>%
+#'    ungroup()%>%
+#'    mutate(pct.area=n.cells/sum(n.cells),
+#'           area.sqkm=(n.cells*(30*30)/1E6),
+#'           cty=county,
+#'           yr=year)
+#'}
+#'
+#'
+#'
+#'
+#'crossing(list.nlcd,names(mo.co.list))%>%
+#'  rename(path=1,
+#'         county=2)%>%
+#'  mutate(year=str_extract(path,pattern='20\\d{2}'))%>%
+#'  pmap(~nlcd.fxn(..1,..2,..3))->nlcd.tab
+#'
+#'  bind_rows(nlcd.tab)%>%
+#'  select(-n.cells,-area.sqkm)%>%
+#'    mutate(LC=paste0(LC,'.pct'))%>%
+#'    pivot_wider(names_from=LC,
+#'                values_from=pct.area)->nlcd.pct.tab
+#'
 #'                    }
 #'
 #' @format
