@@ -99,7 +99,7 @@ future::plan('sequential') # reset
 ```
 You can stop here and delete all the entire **.../unproj/** folder if you like. Alternatively, you can combine all the annual raster files into a multiband raster object. The advantage is you only have to read in one object to get all your rasters. The downside is  it's probably more efficient to process the data by creating lists of files and passing it to [purrr::map] as we have done above. Still...if you want to try...
 
-```{r}
+```{r,eval=FALSE}
 my.rast<-list.files(path=paste0(my.path,'/prj'),
                          pattern='.tif$', # regex for files that end in .tif
                          full.names = TRUE) 
