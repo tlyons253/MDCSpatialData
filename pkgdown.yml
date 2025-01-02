@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   Batch-Process-Raster-from-FedData: Batch-Process-Raster-from-FedData.html
   Missouri-Spatial-Data: Missouri-Spatial-Data.html
-last_built: 2025-01-02T20:06Z
+last_built: 2025-01-02T21:46Z
 urls:
   reference: https://tlyons253.github.io/MDCSpatialData/reference
   article: https://tlyons253.github.io/MDCSpatialData/articles
